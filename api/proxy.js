@@ -2,6 +2,7 @@ const httpProxy = require('http-proxy');
 const proxy = httpProxy.createProxyServer({
     secure: false,
     changeOrigin: true,
+    followRedirects: true,
 });
 const validUrl = require('valid-url');
 const url = require('url');
@@ -40,11 +41,18 @@ const allowCors = fn => async (req, res) => {
     fn(req, res);
 }
 
+proxy.on('proxyReq', function(proxyReq, req, res, options) {
+    // Here would be a good place to modify the outgoing request
+});
+
 proxy.on('proxyRes', function (proxyRes, req, res) {
     proxyRes.headers['cache-control'] = 'no-cache';
+    delete proxyRes.headers['set-cookie'];
 });
 
 module.exports = allowCors(async (req, res) => {
+
+    // Check the provided target URL
     if (!req.headers['target-url']) {
         res.status(STATUS_BAD_REQUEST).end();
         return;
@@ -54,6 +62,9 @@ module.exports = allowCors(async (req, res) => {
         res.status(STATUS_BAD_REQUEST).end();
         return;
     }
+    delete req.headers['target-url'];
+
+    // Check the hostname is allowed
     const { hostname } = new url.URL(target);
     const query = `
         query CheckHost($hostname: String!) {
@@ -73,6 +84,7 @@ module.exports = allowCors(async (req, res) => {
         return;
     }
 
+    // Do the proxying
     proxy.web(req, res, { target });
 });
 
