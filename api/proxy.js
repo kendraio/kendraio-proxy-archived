@@ -64,6 +64,11 @@ module.exports = allowCors(async (req, res) => {
     }
     delete req.headers['target-url'];
 
+    // Remove origin if 'remove-origin' header exists
+    if (req.headers['remove-origin']) {
+        delete req.headers['origin'];
+    }
+    
     // Check the hostname is allowed
     const { hostname } = new url.URL(target);
     const query = `
