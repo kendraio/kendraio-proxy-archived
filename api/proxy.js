@@ -26,6 +26,7 @@ const trace = (label,data) => {
 }
 
 const allowCors = fn => async (req, res) => {
+    trace('request',req);
     if (!req.headers.origin) {
         res.status(STATUS_UNAUTHORIZED).end();
         return;
