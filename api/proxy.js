@@ -51,7 +51,7 @@ const allowCors = fn => async (req, res) => {
 }
 
 proxy.on('proxyReq', function(proxyReq, req, res, options) {    
-    trace('reqest', res.headers);    
+    trace('reqest', proxyReq.headers);    
     // Here would be a good place to modify the outgoing request
     let remove = ['accept','accept-encoding','accept-language']
     remove.forEach( (header) => {proxyReq.removeHeader(header)}  )
@@ -59,11 +59,24 @@ proxy.on('proxyReq', function(proxyReq, req, res, options) {
 });
 
 proxy.on('proxyRes', function (proxyRes, req, res) {
-    trace('proxyRes',res.headers)
+    trace('proxyRes',proxyRes.headers)
     res.setHeader('x-kendraio-proxy','processed');
     proxyRes.headers['cache-control'] = 'no-cache';
     delete proxyRes.headers['set-cookie'];
 });
+
+
+// Listen for the `error` event on the proxy object
+proxy.on('error', (err, req, res) => {
+  // You can define custom behavior for when the proxy encounters an error,
+  // such as logging the error or responding with an error message to the client
+  console.error(err);
+  res.writeHead(500, {
+    'Content-Type': 'text/plain'
+  });
+  res.end('An error occurred while trying to proxy the request.');
+});
+
 
 module.exports = allowCors(async (req, res) => {   
     // Check the provided target URL
