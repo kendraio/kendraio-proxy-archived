@@ -19,7 +19,7 @@ The Kendraio Proxy runs using Vercel cloud functions. Any requests will invoke /
 Allowed destinations
 ====================
 
-The list of allowed destinations is maintained in https://kendraio-proxy.hasura.app/v1/graphql'
+The list of allowed destinations is maintained in https://kendraio-proxy.hasura.app'
 
 
 Running a local version of the proxy
