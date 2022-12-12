@@ -69,6 +69,7 @@ module.exports = allowCors(async (req, res) => {
     }
     const target = validUrl.isWebUri(req.headers['target-url']);
     if (!target) {
+        trace('Not in database',req.headers['target-url']);
         res.status(STATUS_BAD_REQUEST).end();
         return;
     }
