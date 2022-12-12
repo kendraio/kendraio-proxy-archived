@@ -100,6 +100,7 @@ module.exports = allowCors(async (req, res) => {
 
     if (!validHostId) {
         trace('No host',hostname);
+        res.setHeader('x-kendraio-proxy','Host not allowed');
         res.status(STATUS_BAD_REQUEST).end();
         return;
     }
