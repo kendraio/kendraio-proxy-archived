@@ -26,6 +26,7 @@ const trace = (label,data) => {
 }
 
 const allowCors = fn => async (req, res) => {
+    trace('request',req.headers);
     if (!req.headers.origin) {
         res.status(STATUS_UNAUTHORIZED).end();
         return;
@@ -49,13 +50,17 @@ const allowCors = fn => async (req, res) => {
     fn(req, res);
 }
 
-proxy.on('proxyReq', function(proxyReq, req, res, options) {
-    trace('proxyReq',proxyReq);
+proxy.on('proxyReq', function(proxyReq, req, res, options) {    
+    trace('reqest', res.headers);    
     // Here would be a good place to modify the outgoing request
+    let remove = ['accept','accept-encoding','accept-language']
+    remove.forEach( (header) => {proxyReq.removeHeader(header)}  )
+
 });
 
 proxy.on('proxyRes', function (proxyRes, req, res) {
-    trace('proxyRes',res);
+    trace('proxyRes',res.headers)
+    res.setHeader('x-kendraio-proxy','processed');
     proxyRes.headers['cache-control'] = 'no-cache';
     delete proxyRes.headers['set-cookie'];
 });
@@ -68,6 +73,8 @@ module.exports = allowCors(async (req, res) => {
     }
     const target = validUrl.isWebUri(req.headers['target-url']);
     if (!target) {
+        trace('No valid url',req.headers['target-url']);
+        res.setHeader('x-kendraio-proxy','Invalid url');
         res.status(STATUS_BAD_REQUEST).end();
         return;
     }
@@ -93,9 +100,17 @@ module.exports = allowCors(async (req, res) => {
     });
     const { data } = await response.json();
     const validHostId = get(data, 'hosts[0].id');
+    trace('Host Id: ',validHostId);
+    
+
     if (!validHostId) {
-        res.status(STATUS_BAD_REQUEST).end();
-        return;
+        trace('No host',hostname);
+        trace('passthrough', process.env.PASSTHROUGH);
+        res.setHeader('x-kendraio-proxy','Host not allowed.  Passthrough:'+process.env.PASSTHROUGH);
+        if(process.env.PASSTHROUGH !='all') {    
+            res.status(STATUS_BAD_REQUEST).end();
+            return;
+        }    
     }
 
     trace('target', target);
