@@ -51,7 +51,7 @@ proxy.on('proxyRes', function (proxyRes, req, res) {
 });
 
 module.exports = allowCors(async (req, res) => {
-
+   console.log(req);
     // Check the provided target URL
     if (!req.headers['target-url']) {
         res.status(STATUS_BAD_REQUEST).end();
@@ -89,6 +89,7 @@ module.exports = allowCors(async (req, res) => {
         return;
     }
 
+    console.log(target);
     // Do the proxying
     proxy.web(req, res, { target });
 });
