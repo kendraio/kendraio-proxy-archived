@@ -51,16 +51,16 @@ const allowCors = fn => async (req, res) => {
 }
 
 proxy.on('proxyReq', function(proxyReq, req, res, options) {    
-    trace('result', res.headers);
-    res.setHeader('x-kendraio-proxy','processed')
+    trace('reqest', res.headers);    
     // Here would be a good place to modify the outgoing request
-    let remove = ['accept','accept-encoding','accept-language','host','x-cloud-trace']
+    let remove = ['accept','accept-encoding','accept-language']
     remove.forEach( (header) => {proxyReq.removeHeader(header)}  )
 
 });
 
 proxy.on('proxyRes', function (proxyRes, req, res) {
-    trace('proxyRes',res.headers);
+    trace('proxyRes',res.headers)
+    res.setHeader('x-kendraio-proxy','processed');
     proxyRes.headers['cache-control'] = 'no-cache';
     delete proxyRes.headers['set-cookie'];
 });
