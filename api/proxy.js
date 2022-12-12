@@ -26,7 +26,7 @@ const trace = (label,data) => {
 }
 
 const allowCors = fn => async (req, res) => {
-    trace('request',req);
+    trace('request',req.headers);
     if (!req.headers.origin) {
         res.status(STATUS_UNAUTHORIZED).end();
         return;
@@ -50,13 +50,12 @@ const allowCors = fn => async (req, res) => {
     fn(req, res);
 }
 
-proxy.on('proxyReq', function(proxyReq, req, res, options) {
-    trace('proxyReq',proxyReq);
+proxy.on('proxyReq', function(proxyReq, req, res, options) {    
     // Here would be a good place to modify the outgoing request
 });
 
 proxy.on('proxyRes', function (proxyRes, req, res) {
-    trace('proxyRes',res);
+    trace('proxyRes',res.headers);
     proxyRes.headers['cache-control'] = 'no-cache';
     delete proxyRes.headers['set-cookie'];
 });
@@ -102,7 +101,7 @@ module.exports = allowCors(async (req, res) => {
     if (!validHostId) {
         trace('No host',hostname);
         trace('passthrough', process.env.PASSTHROUGH);
-        res.setHeader('x-kendraio-proxy','Host not allowed.  Passthough:'+process.env.PASSTHROUGH);
+        res.setHeader('x-kendraio-proxy','Host not allowed.  Passthrough:'+process.env.PASSTHROUGH);
         if(process.env.PASSTHROUGH !='all') {    
             res.status(STATUS_BAD_REQUEST).end();
             return;
