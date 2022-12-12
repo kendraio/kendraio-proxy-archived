@@ -70,6 +70,7 @@ module.exports = allowCors(async (req, res) => {
     const target = validUrl.isWebUri(req.headers['target-url']);
     if (!target) {
         trace('No valid url',req.headers['target-url']);
+        res.setHeader('x-kendraio-proxy','Invalid url');
         res.status(STATUS_BAD_REQUEST).end();
         return;
     }
