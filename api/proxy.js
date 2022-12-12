@@ -50,8 +50,6 @@ const allowCors = fn => async (req, res) => {
     fn(req, res);
 }
 
-/
-
 proxy.on('proxyReq', function(proxyReq, req, res, options) {    
     trace('result', res.headers);
     res.setHeader('x-kendraio-proxy','processed')
