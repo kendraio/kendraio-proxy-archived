@@ -67,11 +67,6 @@ proxy.on('proxyReq', function(proxyReq, req, res, options) {
 });
 
 proxy.on('proxyRes', function (proxyRes, req, res) {
-    req.removeHeader
-
-
-
-
     trace('proxyRes',res.headers);
     proxyRes.headers['cache-control'] = 'no-cache';
     delete proxyRes.headers['set-cookie'];
