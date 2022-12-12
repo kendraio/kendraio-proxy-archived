@@ -69,7 +69,7 @@ module.exports = allowCors(async (req, res) => {
     }
     const target = validUrl.isWebUri(req.headers['target-url']);
     if (!target) {
-        trace('Not in database',req.headers['target-url']);
+        trace('No valid url',req.headers['target-url']);
         res.status(STATUS_BAD_REQUEST).end();
         return;
     }
@@ -95,7 +95,11 @@ module.exports = allowCors(async (req, res) => {
     });
     const { data } = await response.json();
     const validHostId = get(data, 'hosts[0].id');
+    trace('Host Id: ',validHostId);
+    
+
     if (!validHostId) {
+        trace('No host',hostname);
         res.status(STATUS_BAD_REQUEST).end();
         return;
     }
