@@ -55,7 +55,8 @@ proxy.on('proxyReq', function(proxyReq, req, res, options) {
     // Here would be a good place to modify the outgoing request
     let remove = ['accept','accept-encoding','accept-language']
     let keep = ['authorization']
-    proxyReq.getHeaderNames.forEach( (header) => { if (!keep.includes(header)) {
+    let headers = proxyReq.getHeaderNames();
+    headers.forEach( (header) => { if (!keep.includes(header)) {
         proxyReq.removeHeader(header) 
     }
     });
